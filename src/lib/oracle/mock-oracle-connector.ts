@@ -4,8 +4,10 @@ import type {
   CollectionPlanField,
   InspectionPayload,
   InspectionSubmission,
+  PendingInspectionInput,
   PendingInspectionReceipt
 } from "@/lib/types";
+import { getPendingInspections, savePendingInspection } from "@/lib/storage";
 
 const plans: CollectionPlan[] = [
   {
@@ -79,6 +81,7 @@ const fields: CollectionPlanField[] = [
 
 const receipt: PendingInspectionReceipt = {
   receiptNumber: "R-100245",
+  receiptDate: "2026-05-16",
   poNumber: "PO-77821",
   supplier: "Vision Components Inc.",
   item: "TUBE-001",
@@ -98,8 +101,17 @@ export class MockOracleConnector implements OracleConnector {
     return fields.filter((field) => field.planId === planId);
   }
 
+  async getPendingInspections() {
+    return typeof window === "undefined" ? [receipt] : getPendingInspections();
+  }
+
+  async addPendingInspection(payload: PendingInspectionInput) {
+    return savePendingInspection(payload);
+  }
+
   async getPendingInspectionByReceiptNumber(receiptNumber: string) {
-    return receiptNumber.trim().toUpperCase() === receipt.receiptNumber ? receipt : null;
+    const normalized = receiptNumber.trim().toUpperCase();
+    return (await this.getPendingInspections()).find((item) => item.receiptNumber === normalized) ?? null;
   }
 
   async submitInspectionResult(payload: InspectionPayload): Promise<InspectionSubmission> {
