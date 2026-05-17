@@ -1,4 +1,7 @@
 export type FieldType = "text" | "number" | "date" | "dropdown" | "textarea";
+export type PaperSize = "letter" | "legal" | "a4" | "custom";
+export type PaperOrientation = "portrait" | "landscape";
+export type FormBlockType = "oracleField" | "staticText" | "sectionHeading" | "divider" | "spacer";
 
 export interface CollectionPlan {
   id: string;
@@ -25,6 +28,11 @@ export interface FormFieldConfig {
   readOnly: boolean;
   visible: boolean;
   options?: string[];
+  placeholder?: string;
+  maxLength?: number;
+  decimalPrecision?: number;
+  minValue?: number;
+  maxValue?: number;
 }
 
 export interface FormSection {
@@ -39,10 +47,40 @@ export interface FormDefinition {
   collectionPlanId: string;
   collectionPlanName: string;
   status: "draft" | "published";
+  layout?: PaperLayout;
+  blocks?: FormBlock[];
   sections: FormSection[];
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
+}
+
+export interface PaperLayout {
+  paperSize: PaperSize;
+  orientation: PaperOrientation;
+  widthIn: number;
+  heightIn: number;
+  margins: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  heading: string;
+  rows: number;
+  columns: number;
+}
+
+export interface FormBlock {
+  id: string;
+  type: FormBlockType;
+  row: number;
+  column: number;
+  rowSpan: number;
+  columnSpan: number;
+  label?: string;
+  text?: string;
+  field?: FormFieldConfig;
 }
 
 export interface PendingInspectionReceipt {
