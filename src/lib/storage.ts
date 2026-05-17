@@ -1,7 +1,16 @@
-import type { FormBlock, FormDefinition, FormSection, InspectionSubmission, PaperLayout } from "@/lib/types";
+import type {
+  FormBlock,
+  FormDefinition,
+  FormSection,
+  InspectionSubmission,
+  PaperLayout,
+  PendingInspectionInput,
+  PendingInspectionReceipt
+} from "@/lib/types";
 
 const FORMS_KEY = "oracle-quality-mvp.forms";
 const SUBMISSIONS_KEY = "oracle-quality-mvp.submissions";
+const PENDING_INSPECTIONS_KEY = "oracle-quality-mvp.pending-inspections";
 
 function canUseStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
@@ -42,6 +51,14 @@ export function saveForm(form: FormDefinition) {
   window.dispatchEvent(new Event("forms-updated"));
 }
 
+export function deleteForm(id: string) {
+  writeJson(
+    FORMS_KEY,
+    getForms().filter((form) => form.id !== id)
+  );
+  window.dispatchEvent(new Event("forms-updated"));
+}
+
 export function getPublishedForms() {
   return getForms().filter((form) => form.status === "published");
 }
@@ -56,6 +73,7 @@ export function getSubmission(id: string) {
 
 export function saveSubmission(submission: InspectionSubmission) {
   writeJson(SUBMISSIONS_KEY, [submission, ...getSubmissions()]);
+  window.dispatchEvent(new Event("submissions-updated"));
 }
 
 export const defaultPaperLayout: PaperLayout = {
@@ -71,7 +89,9 @@ export const defaultPaperLayout: PaperLayout = {
   },
   heading: "Incoming Inspection Record",
   rows: 12,
-  columns: 4
+  columns: 4,
+  rowHeightPx: 64,
+  columnWidthPx: 140
 };
 
 export function normalizeFormDefinition(form: FormDefinition): FormDefinition {
@@ -136,4 +156,40 @@ export function blocksToSections(blocks: FormBlock[], fallback: FormSection[] = 
       fields
     }
   ];
+}
+
+export const defaultPendingInspection: PendingInspectionReceipt = {
+  receiptNumber: "R-100245",
+  receiptDate: "2026-05-16",
+  poNumber: "PO-77821",
+  supplier: "Vision Components Inc.",
+  item: "TUBE-001",
+  itemDescription: "Medical tubing component",
+  quantityPendingInspection: 500,
+  uom: "EA",
+  collectionPlanId: "incoming-tubing",
+  collectionPlanName: "Incoming Tubing Inspection"
+};
+
+export function normalizePendingInspection(input: PendingInspectionInput | PendingInspectionReceipt): PendingInspectionReceipt {
+  return {
+    ...defaultPendingInspection,
+    ...input,
+    receiptNumber: input.receiptNumber.trim().toUpperCase(),
+    quantityPendingInspection: Number(input.quantityPendingInspection) || 0
+  };
+}
+
+export function getPendingInspections() {
+  const stored = readJson<PendingInspectionReceipt[]>(PENDING_INSPECTIONS_KEY, []);
+  const normalized = [...stored.map(normalizePendingInspection), defaultPendingInspection];
+  return normalized.filter((inspection, index, all) => all.findIndex((item) => item.receiptNumber === inspection.receiptNumber) === index);
+}
+
+export function savePendingInspection(input: PendingInspectionInput) {
+  const inspection = normalizePendingInspection(input);
+  const existing = getPendingInspections().filter((item) => item.receiptNumber !== inspection.receiptNumber && item.receiptNumber !== defaultPendingInspection.receiptNumber);
+  writeJson(PENDING_INSPECTIONS_KEY, [inspection, ...existing]);
+  window.dispatchEvent(new Event("pending-inspections-updated"));
+  return inspection;
 }
