@@ -70,6 +70,8 @@ export interface PaperLayout {
   heading: string;
   rows: number;
   columns: number;
+  rowHeightPx: number;
+  columnWidthPx: number;
 }
 
 export interface FormBlock {
@@ -86,6 +88,7 @@ export interface FormBlock {
 
 export interface PendingInspectionReceipt {
   receiptNumber: string;
+  receiptDate: string;
   poNumber: string;
   supplier: string;
   item: string;
@@ -111,3 +114,9 @@ export interface InspectionPayload {
   receipt: PendingInspectionReceipt;
   values: Record<string, string | number>;
 }
+
+export type PendingInspectionInput = Omit<
+  PendingInspectionReceipt,
+  "poNumber" | "itemDescription" | "uom" | "collectionPlanId" | "collectionPlanName"
+> &
+  Partial<Pick<PendingInspectionReceipt, "poNumber" | "itemDescription" | "uom" | "collectionPlanId" | "collectionPlanName">>;
