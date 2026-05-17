@@ -30,7 +30,9 @@ body {
     background: white;
   }
 
-  .no-print {
+  .no-print,
+  .builder-ui,
+  .builder-grid-cell {
     display: none !important;
   }
 }
