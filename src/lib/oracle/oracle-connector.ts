@@ -3,6 +3,7 @@ import type {
   CollectionPlanField,
   InspectionPayload,
   InspectionSubmission,
+  PendingInspectionInput,
   PendingInspectionReceipt
 } from "@/lib/types";
 
@@ -11,6 +12,8 @@ import type {
 export interface OracleConnector {
   getCollectionPlans(): Promise<CollectionPlan[]>;
   getCollectionPlanFields(planId: string): Promise<CollectionPlanField[]>;
+  getPendingInspections(): Promise<PendingInspectionReceipt[]>;
+  addPendingInspection(payload: PendingInspectionInput): Promise<PendingInspectionReceipt>;
   getPendingInspectionByReceiptNumber(receiptNumber: string): Promise<PendingInspectionReceipt | null>;
   submitInspectionResult(payload: InspectionPayload): Promise<InspectionSubmission>;
 }
