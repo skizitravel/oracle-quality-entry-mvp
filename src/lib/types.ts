@@ -20,6 +20,7 @@ export interface CollectionPlanField {
 }
 
 export interface FormFieldConfig {
+  [key: string]: unknown;
   id: string;
   sourceFieldId: string;
   displayLabel: string;
