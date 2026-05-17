@@ -38,6 +38,11 @@ export function FieldControl({ field, value, error, onChange }: Props) {
         <Input
           {...shared}
           type={field.type}
+          placeholder={field.placeholder}
+          maxLength={field.maxLength}
+          min={field.type === "number" ? field.minValue : undefined}
+          max={field.type === "number" ? field.maxValue : undefined}
+          step={field.type === "number" && typeof field.decimalPrecision === "number" ? 1 / 10 ** field.decimalPrecision : undefined}
           value={value ?? ""}
           onChange={(event) =>
             onChange(field.type === "number" && event.target.value !== "" ? Number(event.target.value) : event.target.value)
