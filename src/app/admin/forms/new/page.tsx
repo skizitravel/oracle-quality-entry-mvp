@@ -7,7 +7,7 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { oracleConnector } from "@/lib/oracle/mock-oracle-connector";
-import { saveForm } from "@/lib/storage";
+import { defaultPaperLayout, saveForm } from "@/lib/storage";
 import type { CollectionPlan, FormDefinition } from "@/lib/types";
 
 export default function NewFormPage() {
@@ -28,6 +28,21 @@ export default function NewFormPage() {
       status: "draft",
       createdAt: now,
       updatedAt: now,
+      layout: {
+        ...defaultPaperLayout,
+        heading: plan.name
+      },
+      blocks: [
+        {
+          id: crypto.randomUUID(),
+          type: "sectionHeading",
+          row: 1,
+          column: 1,
+          rowSpan: 1,
+          columnSpan: 4,
+          text: plan.name
+        }
+      ],
       sections: [
         { id: crypto.randomUUID(), title: "Inspection Results", fields: [] },
         { id: crypto.randomUUID(), title: "Measurements", fields: [] },
